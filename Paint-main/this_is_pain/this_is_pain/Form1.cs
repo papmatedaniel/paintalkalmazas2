@@ -204,7 +204,8 @@ namespace this_is_pain
             index = 1;
         }
 
-		private void panel1_Paint(object sender, PaintEventArgs e)
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
 		{
 
 		}

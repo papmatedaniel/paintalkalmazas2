@@ -17,3 +17,12 @@ C:\Users\papmd\OneDrive\Asztali gép\paint\paintalkalmazas-main\Paint-main\this_
 C:\Users\papmd\OneDrive\Asztali gép\paint\paintalkalmazas-main\Paint-main\this_is_pain\this_is_pain\obj\Debug\this_is_pain.csproj.CoreCompileInputs.cache
 C:\Users\papmd\OneDrive\Asztali gép\paint\paintalkalmazas-main\Paint-main\this_is_pain\this_is_pain\obj\Debug\this_is_pain.exe
 C:\Users\papmd\OneDrive\Asztali gép\paint\paintalkalmazas-main\Paint-main\this_is_pain\this_is_pain\obj\Debug\this_is_pain.pdb
+Z:\12.E Projektfeladat\paintalkalmazas2-main\Paint-main\this_is_pain\this_is_pain\bin\Debug\this_is_pain.exe.config
+Z:\12.E Projektfeladat\paintalkalmazas2-main\Paint-main\this_is_pain\this_is_pain\bin\Debug\this_is_pain.exe
+Z:\12.E Projektfeladat\paintalkalmazas2-main\Paint-main\this_is_pain\this_is_pain\bin\Debug\this_is_pain.pdb
+Z:\12.E Projektfeladat\paintalkalmazas2-main\Paint-main\this_is_pain\this_is_pain\obj\Debug\this_is_pain.csprojAssemblyReference.cache
+Z:\12.E Projektfeladat\paintalkalmazas2-main\Paint-main\this_is_pain\this_is_pain\obj\Debug\this_is_pain.Form1.resources
+Z:\12.E Projektfeladat\paintalkalmazas2-main\Paint-main\this_is_pain\this_is_pain\obj\Debug\this_is_pain.Properties.Resources.resources
+Z:\12.E Projektfeladat\paintalkalmazas2-main\Paint-main\this_is_pain\this_is_pain\obj\Debug\this_is_pain.csproj.GenerateResource.cache
+Z:\12.E Projektfeladat\paintalkalmazas2-main\Paint-main\this_is_pain\this_is_pain\obj\Debug\this_is_pain.exe
+Z:\12.E Projektfeladat\paintalkalmazas2-main\Paint-main\this_is_pain\this_is_pain\obj\Debug\this_is_pain.pdb
