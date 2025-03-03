@@ -1,0 +1,7 @@
+default ablak méret - ezt nem tudom hova tenni. bevan állítva egy méret ami elvileg minden gépen ugyanaz. nem is tudom ezt a méretet módosítani
+egér mutató megcsinálása - mosmát az alap van beállítva, eddig a cross volt beállítva
+ikon módosítása, mert a fekete nem látszik. - Eddig fekete ikon volt szürke háttérrel, most csak a hátteret lecseréltem fehérre, és így szerintem már látszik
+De azért a színeket, megjelenést tényleg kéne fejleszteni
+kattintásra aktív legyen. - Itt meg Krisztiékre várok, hogy elmondják hogy lehet a nyomi buttont radio buttonra cserélni
+A kitöltésnél a vonal határa nem egyértelmű, és lehet módosítani a túlsó oldalt - Mayba
+Geovanyéknál a visszavonásnak vagy kitöltésnek valami stackje van amit kikell üríteni, hogy ne teljen meg
