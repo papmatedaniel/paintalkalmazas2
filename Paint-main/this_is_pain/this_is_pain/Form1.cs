@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
+
 
 namespace this_is_pain
 {
@@ -34,6 +36,42 @@ namespace this_is_pain
 
         ColorDialog cd = new ColorDialog();
         Color new_color;
+        // Új mezők a Form1 osztályban
+        Stack<Bitmap> undoStack = new Stack<Bitmap>();
+        Stack<Bitmap> redoStack = new Stack<Bitmap>();
+
+        // Állapot mentése rajzolás előtt
+        private void SaveState()
+        {
+            undoStack.Push((Bitmap)bm.Clone());
+            redoStack.Clear(); // Új műveletnél törlődik a redo stack
+        }
+
+        // Visszalépés
+        private void Undo()
+        {
+            if (undoStack.Count > 0)
+            {
+                redoStack.Push((Bitmap)bm.Clone()); // Aktuális állapot mentése a redo stack-be
+                bm = undoStack.Pop(); // Visszatérés az előző állapothoz
+                g = Graphics.FromImage(bm);
+                pic.Image = bm;
+                pic.Refresh();
+            }
+        }
+
+        // Előrelépés
+        private void Redo()
+        {
+            if (redoStack.Count > 0)
+            {
+                undoStack.Push((Bitmap)bm.Clone()); // Aktuális állapot mentése az undo stack-be
+                bm = redoStack.Pop(); // Következő állapot betöltése
+                g = Graphics.FromImage(bm);
+                pic.Image = bm;
+                pic.Refresh();
+            }
+        }
 
         private void pic_MouseDown(object sender, MouseEventArgs e)
         {
@@ -42,6 +80,8 @@ namespace this_is_pain
 
             cX = e.X;
             cY = e.Y;
+            SaveState(); // Állapot mentése
+
 
         }
 
@@ -76,42 +116,53 @@ namespace this_is_pain
             paint = false;
 
             sX = x - cX;
-            sY =y - cY;
+            sY = y - cY;
+
+            int rectX = Math.Min(cX, x);
+            int rectY = Math.Min(cY, y);
+            int rectWidth = Math.Abs(sX);
+            int rectHeight = Math.Abs(sY);
 
             if (index == 3)
             {
-                g.DrawEllipse(p, cX, cY, sX, sY);
+                g.DrawEllipse(p, rectX, rectY, rectWidth, rectHeight);
             }
             if (index == 4)
-            { 
-                g.DrawRectangle(p,cX,cY,sX,sY);
+            {
+                g.DrawRectangle(p, rectX, rectY, rectWidth, rectHeight);
             }
             if (index == 5)
             {
                 g.DrawLine(p, cX, cY, x, y);
             }
 
+            pic.Refresh();  // Biztosítja a frissítést a rajzolás után
         }
 
         private void pic_Paint(object sender, PaintEventArgs e)
         {
-            Graphics g = e.Graphics;
             if (paint)
             {
+                Graphics g = e.Graphics;
+
+                int rectX = Math.Min(cX, x);
+                int rectY = Math.Min(cY, y);
+                int rectWidth = Math.Abs(sX);
+                int rectHeight = Math.Abs(sY);
+
                 if (index == 3)
                 {
-                    g.DrawEllipse(p, cX, cY, sX, sY);
+                    g.DrawEllipse(p, rectX, rectY, rectWidth, rectHeight);
                 }
                 if (index == 4)
                 {
-                    g.DrawRectangle(p, cX, cY, sX, sY);
+                    g.DrawRectangle(p, rectX, rectY, rectWidth, rectHeight);
                 }
                 if (index == 5)
                 {
                     g.DrawLine(p, cX, cY, x, y);
                 }
             }
-            
         }
 
         private void btn_clear_Click(object sender, EventArgs e)
@@ -152,27 +203,58 @@ namespace this_is_pain
                 bm.SetPixel(x, y,new_color);
             }
         }
-        public void Fill(Bitmap bm, int x, int y, Color new_clr)
+        public void Fill(Bitmap bmp, int x, int y, Color newColor)
         {
-            Color old_color_ = bm.GetPixel(x, y);
-            Stack<Point>pixel = new Stack<Point>();
-            pixel.Push(new Point(x, y));
-            bm.SetPixel(x, y, new_clr);
-            if (old_color_ == new_clr) return;
+            Color oldColor = bmp.GetPixel(x, y);
+            if (oldColor.ToArgb() == newColor.ToArgb()) return;
 
-            while (pixel.Count > 0)
+            Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
+            BitmapData bmpData = bmp.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+
+            int bytesPerPixel = 4;
+            int stride = bmpData.Stride;
+            IntPtr ptr = bmpData.Scan0;
+            int totalBytes = Math.Abs(stride) * bmp.Height;
+            byte[] pixels = new byte[totalBytes];
+
+            // Képadatok másolása tömbbe
+            Marshal.Copy(ptr, pixels, 0, totalBytes);
+
+            int targetArgb = oldColor.ToArgb();
+            int newArgb = newColor.ToArgb();
+
+            Queue<Point> queue = new Queue<Point>();
+            queue.Enqueue(new Point(x, y));
+
+            while (queue.Count > 0)
             {
-                Point pt = (Point)pixel.Pop();
-                if (pt.X > 0&& pt.Y > 0 && pt.X < bm.Width - 1 &&  pt.Y < bm.Height - 1)
-                {
-                    validate(bm, pixel, pt.X - 1, pt.Y,old_color_, new_clr);
-                    validate(bm, pixel, pt.X , pt.Y - 1, old_color_, new_clr);
-                    validate(bm, pixel, pt.X + 1, pt.Y, old_color_, new_clr);
-                    validate(bm, pixel, pt.X, pt.Y + 1, old_color_, new_clr);
-                }
+                Point pt = queue.Dequeue();
+                int px = pt.X;
+                int py = pt.Y;
+
+                int index = (py * stride) + (px * bytesPerPixel);
+                int currentArgb = BitConverter.ToInt32(pixels, index);
+
+                if (currentArgb != targetArgb) continue;
+
+                // Szín beállítása
+                pixels[index] = newColor.B;
+                pixels[index + 1] = newColor.G;
+                pixels[index + 2] = newColor.R;
+                pixels[index + 3] = newColor.A;
+
+                // Szomszédos pixelek vizsgálata (gyors, szélességi keresés)
+                if (px > 0) queue.Enqueue(new Point(px - 1, py));
+                if (px < bmp.Width - 1) queue.Enqueue(new Point(px + 1, py));
+                if (py > 0) queue.Enqueue(new Point(px, py - 1));
+                if (py < bmp.Height - 1) queue.Enqueue(new Point(px, py + 1));
             }
 
+            // Frissített képadatok másolása vissza
+            Marshal.Copy(pixels, 0, ptr, totalBytes);
+            bmp.UnlockBits(bmpData);
         }
+
 
         private void pic_MouseClick(object sender, MouseEventArgs e)
         {
@@ -230,7 +312,17 @@ namespace this_is_pain
 
 		}
 
-		private void btn_eraser_Click(object sender, EventArgs e)
+        private void btn_undo_Click(object sender, EventArgs e)
+        {
+            Undo();
+        }
+
+        private void btn_redo_Click(object sender, EventArgs e)
+        {
+            Redo();
+        }
+
+        private void btn_eraser_Click(object sender, EventArgs e)
         {
             index = 2;
         }
